@@ -91,3 +91,8 @@ console.log(a.fn().call(a));//15
 
 ### JSONP
 
+
+
+
+
+### tcp的三次握手 和四次挥手
