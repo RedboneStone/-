@@ -1,3 +1,9 @@
+### \==操作符 和  \=== 操作符的区别
+
+​	==操作符  宽松类型比较   会进行类型转换 "1" == [1] //true
+
+​	===操作符  严格类型比较   比较双方类型不同 即为false
+
 ###  何为Getter Setter  ,它们和Vue等框架有什么关系?
 
 所谓Getter 和 Setter  其实是对象的属性以函数来表示
@@ -8,71 +14,155 @@ Todo:为何这样做   之前无论是读取 对象的属性  还是 设置对�
 
 具体表现: 外界获取对象属性时   获得Getter的函数返回的值 ,   为属性赋值时  调用Setter修改
 
+
+
+给出一个对象,将其所有的属性变为Getter 和 Setter
+
 ```js
 function observe(obj){
-    var arr = Object.keys(obj);
-    arr.forEach(it => {
-        get it
-    })
-    
-    for(var key in obj){
+ 	var initial  = {}
+    for(let key in obj){
         if(obj.hasOwnProperty(key)){
+           initial[key] = obj[key]
             Object.defineProperty(obj,key,{
-                get:
                 
-                
-                set: 
+                get:function(){
+                    return initial[key]
+                },
+                set: function(val){
+                    initial[key] = val
+                } 
             })
         }
     }
+	return obj
 }
+//
+//问题1   爆栈  解决办法
+// 问题2   块级作用域  使用let 替代  var
+//问题三   不能暴露原有属性 
+// 问题4    对象是个深层次的递归对象
 ```
 
+## JS  this的指向  列出所有的情况
+
+### 为什么需要this
+
+​		使用this  可以更加优雅的传递"隐式"传递对象引用 而不用显式传递上下文对象
+
+> this在函数运行时产生,但是this既不指向函数自身或者函数的词法作用域.
+>
+> this指向完全取决于函数的调用方式 how the function is called
+
+### 绑定规则
+
+- 默认绑定
+
+  `独立函数调用`  时   this 指向 全局变量
+
+  1. 如何判断应该应用默认绑定
+
+     分析`调用位置`
+
+  2. 在严格模式下  全局环境无法绑定this  此时 this 绑定 undefined
+
+- 隐式绑定
+
+  调用位置是否有上下文对象
+
+  1. 首先注意  foo() 的声明方式,及其如何被 obj 对象  引用
+
+     无论是在 obj 中  定义  还是  被obj的属性引用   严格来讲  函数都不属于对象
+
+  2. **但是**  调用位置会使用obj上下文来引用函数,  因此 可以认为 在函数**调用** 的时候,被obj **"拥有"**   this 指向 obj
+
+  > tip :   对象属性引用链中只有最顶层或者说是最后一层会影响调用位置  
 
 
-### JS  this的指向  列出所有的情况
+
+  ```js
+  var obj = {
+  	a: 2,
+  	foo: foo,
+      bar: function(){
+          console.log(this.a)
+      } 
+  }
+  var obj2 = {
+      a: 333,
+      obj: obj
+  }
+  window.a = 222// 直接给a 赋值  在 window 上无法直接访问 window.a
+  function foo(){
+      console.log(this.a)
+  }
+  var b = obj.foo
+  b()//222
+  obj.foo()//2
+  foo()//222
+  obj.bar()//2
+  obj2.obj.foo()// 2  不会去寻找obj2 的里的 a 即便obj中不存在a  this 还是指向obj  但其值为undefined
+  ```
+
+- 显式绑定
+
+  使用[call](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/call) , [apply](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/apply) ,  [bind](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/bind) 等函数进行this的绑定
+
+  第一个参数为   你想将  this 绑定到 的地方 但是需要注意的是，指定的`this`值并不一定是该函数执行时真正的`this`值
+
+  > 如果这个函数处于[非严格模式](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Strict_mode)下，则指定为 `null` 或 `undefined` 时会自动替换为指向全局对象，原始值会被包装
+
+- new绑定
+
+
+
+
+- 意外情况
+
+  - 隐式绑定丢失绑定对象,导致this应用默认规则 绑定到window  或者 undefined(严格模式)
+
+    - var b = obj.foo ; b() 赋值操作导致this丢失
+
+    - 调用回调函数 会导致赋值操作   从而  this丢失
+
+      ```js
+      function foo() {
+      	bar()
+      }
+      function bar(){
+          console.log( this.a );
+      }
+      function doFoo(fn) {
+      	// fn 其实引用的是foo
+      	fn(); // <-- 调用位置！
+      }
+      var obj = {
+      	a: 2,
+      	foo: foo
+      };
+      var a = "oops, global"; // a 是全局对象的属性
+      debugger;doFoo( obj.foo ); // "oops, global  
+      
+      // 触发赋值操作  fn = obj.foo  调用栈 doFoo => foo  其调用位置 在 doFoo  独立调用没有附带上下文  
+      ```
+
 
 ```js
-
-var obj = {
-    bar : 3,
-    foo : a,
-    abc : ()=>{
-       return this.bar
-    },
-    xyz : ()=>{
-	  return a()        
-    } 
-} 
-function a(){
-   return this.bar
-}
-var bar = 333
-console.log(obj.foo())//3
-console.log(a())//333
-console.log(obj.abc())
-console.log(obj.abc.call(obj,1))
-console.log(obj.xyz())
-console.log(obj.xyz.call(obj))
-```
-
-
-
-```js
+腾讯面试题
 var x = 20;
 var a = {
- x: 15,
- fn: function() {
- var x = 30;
- return function() {
-  return this.x
- }
- }
+ 	 x: 15,
+	 fn: function() {
+ 		var x = 30;
+ 		return function() {
+  			return this.x
+ 		}	
+ 	}
 }
-console.log(a.fn());//
+console.log(a.fn());//function
 console.log((a.fn())());//20
-console.log(a.fn()());//30  20
-console.log(a.fn()() == (a.fn())());//false true
+console.log(a.fn()());//20
+console.log(a.fn()() == (a.fn())());//true
 console.log(a.fn().call(this));//20
 console.log(a.fn().call(a));//15
 ```
