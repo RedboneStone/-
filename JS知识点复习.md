@@ -1,10 +1,23 @@
-### \==操作符 和  \=== 操作符的区别
+[TOC]
+
+##  \==操作符 和  \=== 操作符的区别
 
 ​	==操作符  宽松类型比较   会进行类型转换 "1" == [1] //true
 
 ​	===操作符  严格类型比较   比较双方类型不同 即为false
 
-###  何为Getter Setter  ,它们和Vue等框架有什么关系?
+​      Object.is(val1,val2) 不会强制类型转换但与  === 有些许区别
+
+```js
+Object.is(NaN,NaN)//true
+NaN === NaN//false
+Object.is(+0,-0)//false
++0 === -0//true
+```
+
+
+
+##  何为Getter Setter  ,它们和Vue等框架有什么关系?
 
 所谓Getter 和 Setter  其实是对象的属性以函数来表示
 
@@ -169,9 +182,36 @@ console.log(a.fn().call(a));//15
 
 
 
+## 类 Class
+
+面试题:  用js实现一个进度条动画
+
+```js
+Class Proress_bar {
+    constructor(){
+        this.curr = 0
+        this.outer = document.create
+    },
+    start(){
+        
+    },
+    end(){
+            
+    },
+    add(){
+            
+    },
+    set(){
+            
+    }
+}
+```
 
 
-### 闭包
+
+
+
+## 闭包
 
 
 
@@ -179,10 +219,10 @@ console.log(a.fn().call(a));//15
 
 
 
-### JSONP
+## JSONP
 
 
 
 
 
-### tcp的三次握手 和四次挥手
+## tcp的三次握手 和四次挥手

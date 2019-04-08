@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+	<style>
+				.Bar_outer{
+					position: fixed;
+					top:0;
+					left:0;
+					right:0;
+					background-color:rgb(211, 234, 252);
+				}
+				.Bar_inner{
+					height: 5px;
+					width:0%;
+					background-color: rgb(39, 149, 238);
+					transition: width 1s ;
+				}
+	</style>
+</head>
+<body>
+    
+
+
+</body>
+<script>
+	class progress_bar {
+		constructor(){
+			this.curr = 0
+			this.outer = document.createElement('div')
+			this.inner = document.createElement('div')
+			this.outer.append(this.inner)
+			this.outer.className = 'Bar_outer'
+			this.inner.className = 'Bar_inner'
+		}
+		start(){
+                this.set(3)
+				document.body.appendChild(this.outer)
+        }
+         end(){
+            this.set(100)
+			setTimeout(()=>
+				document.body.removeChild(this.outer)
+			,1000)
+        }
+        add(val){
+             this.set(this.curr + val)
+			 this.inner.style.width = this.curr + "%"
+         }
+         set(val){
+             this.curr = val
+			 this.inner.style.width = this.curr + "%"
+         }
+	
+	}
+
+ 
+</script>
+</html>
